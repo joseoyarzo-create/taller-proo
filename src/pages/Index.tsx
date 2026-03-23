@@ -189,7 +189,7 @@ const Index = () => {
               </div>
               <div>
                 <h3 className="font-semibold text-lg">Dinero Generado</h3>
-                <p className="text-sm text-muted-foreground">${stats.dineroGenerado.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">${(stats.dineroGenerado || 0).toLocaleString()}</p>
               </div>
             </div>
           </div>
