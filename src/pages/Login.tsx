@@ -11,26 +11,43 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Convert username to email format for Supabase auth
     const email = `${username.toLowerCase().trim()}@taller.local`;
-    const { error } = await signIn(email, password);
-
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Usuario o contraseña incorrectos',
-        variant: 'destructive',
-      });
+    
+    if (isRegistering) {
+      const { error } = await signUp(email, password);
+      if (error) {
+        toast({
+          title: 'Error',
+          description: 'No se pudo registrar el usuario',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Éxito',
+          description: 'Usuario registrado. Ahora puedes iniciar sesión.',
+        });
+        setIsRegistering(false);
+      }
     } else {
-      navigate('/');
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast({
+          title: 'Error',
+          description: 'Usuario o contraseña incorrectos',
+          variant: 'destructive',
+        });
+      } else {
+        navigate('/');
+      }
     }
 
     setLoading(false);
@@ -41,10 +58,10 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-primary">
-            Sistema de Fichas Técnicas
+            TallerPro - Gestión Técnica
           </CardTitle>
           <CardDescription>
-            Inicia sesión para continuar
+            {isRegistering ? 'Crea una cuenta nueva' : 'Inicia sesión para continuar'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -73,8 +90,18 @@ const Login = () => {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Cargando...' : 'Iniciar sesión'}
+              {loading ? 'Cargando...' : (isRegistering ? 'Registrarse' : 'Iniciar sesión')}
             </Button>
+            
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => setIsRegistering(!isRegistering)}
+                className="text-sm text-primary hover:underline"
+              >
+                {isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
+              </button>
+            </div>
           </form>
         </CardContent>
       </Card>
