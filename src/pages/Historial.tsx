@@ -16,11 +16,17 @@ const HistorialPage = () => {
   useEffect(() => {
     const loadHistorial = async () => {
       const data = await getHistorialCompleto();
-      setHistorial(data);
-      setFilteredHistorial(data);
+      const validData = data.filter(item => item.ordenes);
+      setHistorial(validData);
+      setFilteredHistorial(validData);
 
-      const uniqueClientes = [...new Set(data.map(item => item.ordenes.cliente_nombre))];
-      const uniqueOrdenes = [...new Set(data.map(item => item.ordenes.numero_orden))];
+      const uniqueClientes = [...new Set(validData.map(item => 
+        Array.isArray(item.ordenes) ? item.ordenes[0]?.cliente_nombre : item.ordenes?.cliente_nombre
+      ))].filter(Boolean) as string[];
+
+      const uniqueOrdenes = [...new Set(validData.map(item => 
+        Array.isArray(item.ordenes) ? item.ordenes[0]?.numero_orden : item.ordenes?.numero_orden
+      ))].filter(Boolean) as string[];
       setClientes(uniqueClientes);
       setOrdenes(uniqueOrdenes);
     };
